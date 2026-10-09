@@ -1,10 +1,18 @@
+// [OP-02] Pantalla de Login en Flutter y autenticación con JWT
+// Criterios de Aceptación:
+// 1. Valida formato de correo y longitud de contraseña antes de enviar la petición.
+// 2. Consume el endpoint POST /api/auth/login y recibe token JWT con expiración.
+// 3. Almacena el token y datos del usuario localmente (SharedPreferences / AuthStorage).
+// 4. Redirige al dashboard correspondiente según el rol (admin o empleado).
+// 5. Muestra mensajes de error claros ante credenciales incorrectas.
+
 import 'package:flutter/material.dart';
 import '../utils/colors.dart';
 import '../utils/input_validation.dart';
 import '../utils/auth_storage.dart';
 import '../services/auth_service.dart';
 import 'admin/dashboard_admin.dart';
-import 'empleado/dashboard_empleado.dart';  // ✅ Agregar esta importación
+import 'empleado/dashboard_empleado.dart';
 
 class LoginScreen extends StatefulWidget {
   @override

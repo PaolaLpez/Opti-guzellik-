@@ -1,4 +1,4 @@
-// lib/services/auth_service.dart
+// [OP-02] Servicio de autenticación y consumo de JWT (POST /api/auth/login)
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../utils/app_config.dart';
