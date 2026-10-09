@@ -1,4 +1,9 @@
-// lib/screens/empleado/productos/productos_empleado.dart
+// [OP-06] Filtros interactivos por categoría y barra de búsqueda en Flutter
+// Criterios de Aceptación:
+// 1. Chips o pestañas para filtrar por tipo de producto (armazones, micas, lentes de contacto, accesorios).
+// 2. Campo de búsqueda reactivo por nombre, código o marca.
+// 3. Mensaje amigable cuando no haya coincidencias con el filtro aplicado.
+
 import 'package:flutter/material.dart';
 import '../../../utils/colors.dart';
 import '../../../services/producto_service.dart';
@@ -11,16 +16,23 @@ class ProductosEmpleado extends StatefulWidget {
 }
 
 class _ProductosEmpleadoState extends State<ProductosEmpleado> {
+  final TextEditingController _searchController = TextEditingController();
   List<Producto> _productos = [];
   bool _isLoading = true;
   String _errorMessage = '';
   String _searchQuery = '';
-  String _selectedTipo = 'todos'; // Filtro por categoría
+  String _selectedTipo = 'todos'; // Filtro interactivo por categoría
 
   @override
   void initState() {
     super.initState();
     _cargarProductos();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _cargarProductos() async {
@@ -45,15 +57,23 @@ class _ProductosEmpleadoState extends State<ProductosEmpleado> {
 
   List<Producto> get _productosFiltrados {
     return _productos.where((p) {
-      final matchesSearch = _searchQuery.isEmpty ||
-          p.nombre.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          p.marca.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          p.codigo.toLowerCase().contains(_searchQuery.toLowerCase());
-
       final matchesTipo = _selectedTipo == 'todos' || p.tipo == _selectedTipo;
+      final query = _searchQuery.toLowerCase().trim();
+      final matchesSearch = query.isEmpty ||
+          p.nombre.toLowerCase().contains(query) ||
+          p.marca.toLowerCase().contains(query) ||
+          p.codigo.toLowerCase().contains(query);
 
-      return matchesSearch && matchesTipo;
+      return matchesTipo && matchesSearch;
     }).toList();
+  }
+
+  void _limpiarFiltros() {
+    setState(() {
+      _searchController.clear();
+      _searchQuery = '';
+      _selectedTipo = 'todos';
+    });
   }
 
   Future<void> _agregarProducto() async {
@@ -125,6 +145,8 @@ class _ProductosEmpleadoState extends State<ProductosEmpleado> {
 
   @override
   Widget build(BuildContext context) {
+    final bool hayFiltrosActivos = _selectedTipo != 'todos' || _searchQuery.trim().isNotEmpty;
+
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -142,7 +164,7 @@ class _ProductosEmpleadoState extends State<ProductosEmpleado> {
         actions: [
           IconButton(
             icon: Icon(Icons.refresh, color: AppColors.azulReal),
-            tooltip: 'Recargar catálogo',
+            tooltip: 'Actualizar catálogo',
             onPressed: _cargarProductos,
           ),
         ],
@@ -150,13 +172,23 @@ class _ProductosEmpleadoState extends State<ProductosEmpleado> {
           preferredSize: Size.fromHeight(115),
           child: Column(
             children: [
-              // Barra de búsqueda
+              // 1. Campo de búsqueda reactivo por nombre, código o marca
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: TextField(
+                  controller: _searchController,
                   decoration: InputDecoration(
                     hintText: 'Buscar por nombre, marca o código...',
                     prefixIcon: Icon(Icons.search, color: AppColors.azulCobalto),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(Icons.clear, color: Colors.grey),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                          )
+                        : null,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
@@ -172,10 +204,11 @@ class _ProductosEmpleadoState extends State<ProductosEmpleado> {
                   },
                 ),
               ),
-              // Filtro rápido por tipo (Armazones, Micas, Lentes de contacto)
+
+              // 2. Chips interactivos para filtrar por categoría
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                 child: Row(
                   children: [
                     _buildFilterChip('todos', 'Todos', Icons.grid_view),
@@ -190,6 +223,7 @@ class _ProductosEmpleadoState extends State<ProductosEmpleado> {
                   ],
                 ),
               ),
+              SizedBox(height: 4),
             ],
           ),
         ),
@@ -222,25 +256,64 @@ class _ProductosEmpleadoState extends State<ProductosEmpleado> {
                 )
               : _productosFiltrados.isEmpty
                   ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.inventory, size: 64, color: Colors.grey),
-                          SizedBox(height: 16),
-                          Text(
-                            'No hay productos registrados',
-                            style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-                          ),
-                          SizedBox(height: 8),
-                          ElevatedButton.icon(
-                            onPressed: _agregarProducto,
-                            icon: Icon(Icons.add),
-                            label: Text('Agregar Producto'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.turquesa,
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              hayFiltrosActivos ? Icons.search_off : Icons.inventory_2_outlined,
+                              size: 64,
+                              color: Colors.grey[400],
                             ),
-                          ),
-                        ],
+                            SizedBox(height: 16),
+                            Text(
+                              hayFiltrosActivos
+                                  ? 'No se encontraron coincidencias'
+                                  : 'No hay productos registrados',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey[800],
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              hayFiltrosActivos
+                                  ? 'Intenta con otro término o selecciona una categoría diferente.'
+                                  : 'Comienza agregando un nuevo producto al catálogo.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                            ),
+                            SizedBox(height: 16),
+                            if (hayFiltrosActivos)
+                              ElevatedButton.icon(
+                                onPressed: _limpiarFiltros,
+                                icon: Icon(Icons.filter_alt_off),
+                                label: Text('Limpiar Filtros'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.azulReal,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              )
+                            else
+                              ElevatedButton.icon(
+                                onPressed: _agregarProducto,
+                                icon: Icon(Icons.add),
+                                label: Text('Agregar Producto'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.turquesa,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
                     )
                   : LayoutBuilder(
