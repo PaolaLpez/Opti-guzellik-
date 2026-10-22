@@ -1,3 +1,8 @@
+// [OP-10] Formulario adaptado para consulta pediátrica y revisiones subsecuentes
+// Criterios de Aceptación:
+// 1. Formulario de infantes incluye datos del tutor y pruebas de fijación.
+// 2. Formulario de revisión subsecuente permite comparar con la graduación anterior.
+// 3. Sección de notas clínicas y recomendaciones para padres de familia.
 import 'package:flutter/material.dart';
 import '../../../utils/colors.dart';
 import '../../../services/paciente_service.dart';
