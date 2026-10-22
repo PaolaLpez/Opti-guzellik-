@@ -1,3 +1,8 @@
+// [OP-11] Carrito de venta y selección de productos
+// Criterios de Aceptación:
+// 1. Selección ágil de productos desde el catálogo con tarjeta POS.
+// 2. Carrito de compra reactivo con control de cantidades y eliminación de ítems.
+// 3. Cálculo dinámico de subtotales y total acumulado de la venta.
 import 'package:flutter/material.dart';
 import '../../models/productos/producto_model.dart';
 import '../../utils/colors.dart';
@@ -145,3 +150,4 @@ class ProductoPosCard extends StatelessWidget {
     }
   }
 }
+
