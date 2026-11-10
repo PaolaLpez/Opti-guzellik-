@@ -1,3 +1,4 @@
+// [OP-02] Validaciones de entrada reutilizables (formato de correo y longitud de contraseña).
 /// Validaciones de entrada reutilizables (formato, longitud, sin confiar en el cliente).
 class InputValidators {
   InputValidators._();
