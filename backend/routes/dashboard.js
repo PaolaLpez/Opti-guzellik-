@@ -4,6 +4,7 @@ const router = express.Router();
 const Venta = require('../models/Venta');
 const Producto = require('../models/Producto');
 const { verificarToken } = require('../middleware/authMiddleware');
+const { handleServerError } = require('../middleware/errorHandler');
 
 // Todas las rutas requieren autenticación
 router.use(verificarToken);
@@ -101,8 +102,7 @@ router.get('/stats', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error en dashboard stats:', error);
-    res.status(500).json({ error: error.message });
+    return handleServerError(res, error, 'Error al obtener métricas del dashboard');
   }
 });
 
@@ -133,8 +133,7 @@ router.get('/ventas/dia/:fecha?', async (req, res) => {
 
     res.json(ventasFormateadas);
   } catch (error) {
-    console.error('Error en ventas/dia:', error);
-    res.status(500).json({ error: error.message });
+    return handleServerError(res, error, 'Error al obtener ventas del día');
   }
 });
 
@@ -147,8 +146,7 @@ router.get('/productos/stock-bajo', async (req, res) => {
     
     res.json(productos);
   } catch (error) {
-    console.error('Error en stock-bajo:', error);
-    res.status(500).json({ error: error.message });
+    return handleServerError(res, error, 'Error al consultar productos con stock bajo');
   }
 });
 

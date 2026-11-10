@@ -1,6 +1,7 @@
 const Venta = require('../models/Venta');
 const Producto = require('../models/Producto');
 const mongoose = require('mongoose');
+const { handleServerError } = require('../middleware/errorHandler');
 
 // Obtener todas las ventas
 exports.getVentas = async (req, res) => {
@@ -12,7 +13,7 @@ exports.getVentas = async (req, res) => {
     
     res.json(ventas);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener ventas');
   }
 };
 
@@ -36,7 +37,7 @@ exports.getVentasByFecha = async (req, res) => {
     
     res.json(ventas);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al filtrar ventas por fecha');
   }
 };
 
@@ -53,7 +54,7 @@ exports.getVentaById = async (req, res) => {
     
     res.json(venta);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener la venta');
   }
 };
 
@@ -217,17 +218,13 @@ exports.createVenta = async (req, res) => {
     }
     
     if (error.name === 'ValidationError') {
-      const errores = {};
-      for (const field in error.errors) {
-        errores[field] = error.errors[field].message;
-      }
       return res.status(400).json({ 
-        message: 'Error de validación', 
-        errors: errores 
+        message: 'Error de validación en los datos de la venta'
       });
     }
     
-    res.status(400).json({ message: error.message });
+    console.error('Error en createVenta:', error);
+    return res.status(400).json({ message: 'No se pudo registrar la venta. Verifique los datos.' });
   }
 };
 
@@ -412,7 +409,8 @@ exports.registrarAbono = async (req, res) => {
     res.json(venta);
     
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error('Error en registrarAbono:', error);
+    return res.status(400).json({ message: 'Error al registrar el abono' });
   }
 };
 
@@ -428,7 +426,7 @@ exports.getHistorialAbonos = async (req, res) => {
     
     res.json(venta.historial_abonos || []);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener abonos');
   }
 };
 
@@ -444,6 +442,6 @@ exports.getVentasByPaciente = async (req, res) => {
     
     res.json(ventas);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al consultar ventas del paciente');
   }
 };
