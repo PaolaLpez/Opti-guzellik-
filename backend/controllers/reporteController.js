@@ -1,6 +1,7 @@
 const Venta = require('../models/Venta');
 const Producto = require('../models/Producto');
 const Usuario = require('../models/User');
+const { handleServerError } = require('../middleware/errorHandler');
 
 // Obtener resumen de ventas por período
 exports.getResumenVentas = async (req, res) => {
@@ -63,11 +64,10 @@ exports.getResumenVentas = async (req, res) => {
       promedioVenta
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener resumen de ventas');
   }
 };
 
-// Obtener ventas del día
 // Obtener ventas del día
 exports.getVentasDelDia = async (req, res) => {
   try {
@@ -82,9 +82,6 @@ exports.getVentasDelDia = async (req, res) => {
       fecha: { $gte: hoy, $lt: manana },
       activo: true
     }).sort({ fecha: -1 });
-    
-    ventas.forEach(venta => {
-    });
 
     // Formatear ventas para el frontend
     const ventasFormateadas = ventas.map(venta => ({
@@ -99,7 +96,7 @@ exports.getVentasDelDia = async (req, res) => {
     
     res.json(ventasFormateadas);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener ventas del día');
   }
 };
 
@@ -146,7 +143,7 @@ exports.getProductosMasVendidos = async (req, res) => {
 
     res.json(productosTop);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener productos más vendidos');
   }
 };
 
@@ -160,7 +157,7 @@ exports.getProductosBajoStock = async (req, res) => {
 
     res.json(productos);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener productos con stock bajo');
   }
 };
 
@@ -203,7 +200,7 @@ exports.getVentasPorEmpleado = async (req, res) => {
 
     res.json(resultado);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al calcular ventas por empleado');
   }
 };
 
@@ -257,7 +254,7 @@ exports.getVentas = async (req, res) => {
     
     res.json(ventasFormateadas);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener ventas');
   }
 };
 
@@ -318,7 +315,7 @@ exports.getDashboardStats = async (req, res) => {
       ventasPendientes
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener estadísticas del dashboard');
   }
 };
 
@@ -335,7 +332,7 @@ exports.getVentasPorEstado = async (req, res) => {
     
     res.json(resultado);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener ventas por estado');
   }
 };
 
@@ -359,6 +356,6 @@ exports.getProductosBajoStockDetallado = async (req, res) => {
     
     res.json(resultado);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener detalle de stock bajo');
   }
 };

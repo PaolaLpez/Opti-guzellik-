@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const { handleServerError } = require('../middleware/errorHandler');
 
 // Obtener todos los usuarios
 exports.getUsuarios = async (req, res) => {
@@ -7,7 +8,7 @@ exports.getUsuarios = async (req, res) => {
     const usuarios = await User.find().select('-password');
     res.json(usuarios);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener usuarios');
   }
 };
 
@@ -20,7 +21,7 @@ exports.getUsuarioById = async (req, res) => {
     }
     res.json(usuario);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al consultar usuario');
   }
 };
 
@@ -56,7 +57,7 @@ exports.createUsuario = async (req, res) => {
     
     res.status(201).json(userResponse);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al crear usuario');
   }
 };
 
@@ -87,7 +88,7 @@ exports.updateUsuario = async (req, res) => {
 
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al actualizar usuario');
   }
 };
 
@@ -127,7 +128,7 @@ exports.deleteUsuario = async (req, res) => {
 
     res.json({ message: 'Usuario eliminado permanentemente', user });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al eliminar usuario');
   }
 };
 
@@ -155,6 +156,6 @@ exports.toggleActivo = async (req, res) => {
 
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al cambiar estado de usuario');
   }
 };

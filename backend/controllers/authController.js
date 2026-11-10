@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { handleServerError } = require('../middleware/errorHandler');
 
 // Registro de usuarios (solo para crear usuarios de prueba)
 exports.register = async (req, res) => {
@@ -38,7 +39,7 @@ exports.register = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al registrar el usuario');
   }
 };
 
@@ -91,7 +92,7 @@ exports.login = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al iniciar sesión');
   }
 };
 
@@ -116,7 +117,7 @@ exports.changePassword = async (req, res) => {
 
     res.json({ message: 'Contraseña actualizada correctamente' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al cambiar la contraseña');
   }
 };
 
@@ -143,6 +144,10 @@ exports.verifyToken = async (req, res) => {
     
     if (!user) {
       return res.status(401).json({ message: 'Usuario no encontrado' });
+    }
+    
+    if (!user.activo) {
+      return res.status(401).json({ message: 'Usuario inactivo' });
     }
     
     res.json({ user });
