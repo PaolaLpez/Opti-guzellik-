@@ -1,3 +1,9 @@
+// [OP-07] Gestión y registro de productos con atributos ópticos (CRUD)
+// Criterios de Aceptación:
+// 1. Formulario adaptativo según el tipo (armazón: material, color, medidas; mica: tratamientos, material, serie).
+// 2. Control de precio de compra y precio de venta.
+// 3. Validación de código único de producto y stock inicial.
+// 4. Desactivación lógica de productos para conservarlos en el historial de ventas.
 import 'package:flutter/material.dart';
 import '../../../utils/colors.dart';
 import '../../../services/producto_service.dart';

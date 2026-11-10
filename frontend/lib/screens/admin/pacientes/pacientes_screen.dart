@@ -1,3 +1,9 @@
+// [OP-08] Directorio y registro básico de pacientes
+// Criterios de Aceptación:
+// 1. Captura de nombre completo, edad, teléfono, correo y ocupación.
+// 2. Búsqueda ágil en el directorio por nombre o número telefónico.
+// 3. Validación de teléfono con formato válido para México (10 dígitos).
+// 4. Alerta de duplicidad si el número telefónico ya está registrado.
 import 'package:flutter/material.dart';
 import '../../../utils/colors.dart';
 import '../../../services/paciente_service.dart';

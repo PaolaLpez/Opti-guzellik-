@@ -366,57 +366,78 @@ class _ReportesScreenState extends State<ReportesScreen> {
   }
 
   Widget _buildTarjetasResumen() {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      crossAxisCount: 4,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      childAspectRatio: 1.8,
-      children: [
-        _buildTarjetaResumen(
-          'Ventas totales',
-          _moneda.format(_resumenVentas!.totalVentas),
-          Icons.attach_money,
-          Colors.green,
-          '${_resumenVentas!.cantidadVentas} ventas',
-        ),
-        _buildTarjetaResumen(
-          'Efectivo',
-          _moneda.format(_resumenVentas!.efectivo),
-          Icons.money,
-          Colors.blue,
-          '${((_resumenVentas!.efectivo / _resumenVentas!.totalVentas) * 100).toStringAsFixed(1)}%',
-        ),
-        _buildTarjetaResumen(
-          'Tarjeta',
-          _moneda.format(_resumenVentas!.tarjeta),
-          Icons.credit_card,
-          Colors.purple,
-          '${((_resumenVentas!.tarjeta / _resumenVentas!.totalVentas) * 100).toStringAsFixed(1)}%',
-        ),
-        _buildTarjetaResumen(
-          'Promedio',
-          _moneda.format(_resumenVentas!.promedioVenta),
-          Icons.trending_up,
-          Colors.orange,
-          'por venta',
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double width = constraints.maxWidth;
+        final int crossAxisCount;
+        if (width >= 960) {
+          crossAxisCount = 4;
+        } else if (width >= 580) {
+          crossAxisCount = 2;
+        } else {
+          crossAxisCount = 1;
+        }
+
+        const double spacing = 16.0;
+        final double itemWidth =
+            (width - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
+        const double desiredHeight = 142.0;
+        final double childAspectRatio =
+            (itemWidth / desiredHeight).clamp(0.8, 4.0);
+
+        return GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: crossAxisCount,
+          crossAxisSpacing: spacing,
+          mainAxisSpacing: spacing,
+          childAspectRatio: childAspectRatio,
+          children: [
+            _buildTarjetaResumen(
+              'Ventas totales',
+              _moneda.format(_resumenVentas!.totalVentas),
+              Icons.attach_money,
+              Colors.green,
+              '${_resumenVentas!.cantidadVentas} ventas',
+            ),
+            _buildTarjetaResumen(
+              'Efectivo',
+              _moneda.format(_resumenVentas!.efectivo),
+              Icons.money,
+              Colors.blue,
+              '${((_resumenVentas!.efectivo / _resumenVentas!.totalVentas) * 100).toStringAsFixed(1)}%',
+            ),
+            _buildTarjetaResumen(
+              'Tarjeta',
+              _moneda.format(_resumenVentas!.tarjeta),
+              Icons.credit_card,
+              Colors.purple,
+              '${((_resumenVentas!.tarjeta / _resumenVentas!.totalVentas) * 100).toStringAsFixed(1)}%',
+            ),
+            _buildTarjetaResumen(
+              'Promedio',
+              _moneda.format(_resumenVentas!.promedioVenta),
+              Icons.trending_up,
+              Colors.orange,
+              'por venta',
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildTarjetaResumen(String titulo, String valor, IconData icono, Color color, String subtitulo) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 10,
-            offset: Offset(0, 5),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -428,30 +449,55 @@ class _ReportesScreenState extends State<ReportesScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(7),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: color.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icono, color: color),
+                child: Icon(icono, color: color, size: 22),
               ),
-              Text(
-                subtitulo,
-                style: TextStyle(fontSize: 12, color: color),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  subtitulo,
+                  textAlign: TextAlign.end,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
             ],
           ),
-          Text(
-            valor,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: AppColors.azulReal,
+          const SizedBox(height: 4),
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                valor,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.azulReal,
+                ),
+                maxLines: 1,
+              ),
             ),
           ),
+          const SizedBox(height: 2),
           Text(
             titulo,
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
           ),
         ],
       ),
@@ -803,43 +849,64 @@ class _ReportesScreenState extends State<ReportesScreen> {
               style: TextStyle(fontSize: 12, color: Colors.grey[600]),
             ),
             SizedBox(height: 16),
-            GridView.count(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              crossAxisCount: 4,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 1.8,
-              children: [
-                _buildTarjetaResumen(
-                  'Productos activos',
-                  activos.length.toString(),
-                  Icons.inventory,
-                  Colors.blue,
-                  'en catálogo',
-                ),
-                _buildTarjetaResumen(
-                  'Unidades en stock',
-                  unidades.toString(),
-                  Icons.numbers,
-                  Colors.indigo,
-                  'piezas',
-                ),
-                _buildTarjetaResumen(
-                  'Valor a costo',
-                  _moneda.format(valorCosto),
-                  Icons.attach_money,
-                  Colors.orange,
-                  'inversión',
-                ),
-                _buildTarjetaResumen(
-                  'Valor a precio venta',
-                  _moneda.format(valorVenta),
-                  Icons.sell,
-                  Colors.green,
-                  'potencial',
-                ),
-              ],
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final double width = constraints.maxWidth;
+                final int crossAxisCount;
+                if (width >= 960) {
+                  crossAxisCount = 4;
+                } else if (width >= 580) {
+                  crossAxisCount = 2;
+                } else {
+                  crossAxisCount = 1;
+                }
+
+                const double spacing = 16.0;
+                final double itemWidth =
+                    (width - ((crossAxisCount - 1) * spacing)) / crossAxisCount;
+                const double desiredHeight = 142.0;
+                final double childAspectRatio =
+                    (itemWidth / desiredHeight).clamp(0.8, 4.0);
+
+                return GridView.count(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  crossAxisCount: crossAxisCount,
+                  crossAxisSpacing: spacing,
+                  mainAxisSpacing: spacing,
+                  childAspectRatio: childAspectRatio,
+                  children: [
+                    _buildTarjetaResumen(
+                      'Productos activos',
+                      activos.length.toString(),
+                      Icons.inventory,
+                      Colors.blue,
+                      'en catálogo',
+                    ),
+                    _buildTarjetaResumen(
+                      'Unidades en stock',
+                      unidades.toString(),
+                      Icons.numbers,
+                      Colors.indigo,
+                      'piezas',
+                    ),
+                    _buildTarjetaResumen(
+                      'Valor a costo',
+                      _moneda.format(valorCosto),
+                      Icons.attach_money,
+                      Colors.orange,
+                      'inversión',
+                    ),
+                    _buildTarjetaResumen(
+                      'Valor a precio venta',
+                      _moneda.format(valorVenta),
+                      Icons.sell,
+                      Colors.green,
+                      'potencial',
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),

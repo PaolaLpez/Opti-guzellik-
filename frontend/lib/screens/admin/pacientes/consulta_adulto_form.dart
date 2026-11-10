@@ -1,3 +1,9 @@
+// [OP-09] Historia clínica y examen optométrico integral
+// Criterios de Aceptación:
+// 1. Registro de síntomas y antecedentes patológicos (diabetes, hipertensión, alergias).
+// 2. Tabla de Agudeza Visual (lejana, cerca, con/sin lentes, estenopeica).
+// 3. Refracción final por ojo: Esfera, Cilindro, Eje, Adición y Distancia Pupilar (DNP).
+// 4. Formularios con secciones colapsables o tabs para agilizar la captura en consulta.
 import 'package:flutter/material.dart';
 import '../../../utils/colors.dart';
 import '../../../services/paciente_service.dart';
@@ -1424,3 +1430,4 @@ class _ConsultaAdultoFormState extends State<ConsultaAdultoForm> {
     );
   }
 }
+
