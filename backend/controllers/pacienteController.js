@@ -1,4 +1,5 @@
 const Paciente = require('../models/Paciente');
+const { handleServerError } = require('../middleware/errorHandler');
 
 // Evita que caracteres especiales de regex (o un objeto inyectado vía query
 // string, ej. ?q[$gt]=) rompan la búsqueda o disparen un patrón costoso.
@@ -23,8 +24,7 @@ exports.getPacientes = async (req, res) => {
     const pacientes = await Paciente.find().sort({ fecha_registro: -1 });
     res.json(pacientes);
   } catch (error) {
-    console.error('Error en getPacientes:', error);
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener pacientes');
   }
 };
 
@@ -37,8 +37,7 @@ exports.getPacienteById = async (req, res) => {
     }
     res.json(paciente);
   } catch (error) {
-    console.error('Error en getPacienteById:', error);
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener el paciente');
   }
 };
 
@@ -50,7 +49,7 @@ exports.createPaciente = async (req, res) => {
     res.status(201).json(nuevoPaciente);
   } catch (error) {
     console.error('Error en createPaciente:', error);
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: 'Datos de paciente no válidos' });
   }
 };
 
@@ -68,7 +67,7 @@ exports.updatePaciente = async (req, res) => {
     res.json(paciente);
   } catch (error) {
     console.error('Error en updatePaciente:', error);
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: 'Datos de actualización no válidos' });
   }
 };
 
@@ -85,8 +84,7 @@ exports.deletePaciente = async (req, res) => {
     }
     res.json({ message: 'Paciente desactivado correctamente', paciente });
   } catch (error) {
-    console.error('Error en deletePaciente:', error);
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al desactivar el paciente');
   }
 };
 
@@ -107,8 +105,7 @@ exports.buscarPacientes = async (req, res) => {
     }).limit(20);
     res.json(pacientes);
   } catch (error) {
-    console.error('Error en buscarPacientes:', error);
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error en la búsqueda de pacientes');
   }
 };
 
@@ -117,8 +114,7 @@ exports.addConsulta = async (req, res) => {
   try {
     if (!req.body.fecha || !req.body.especialista || !req.body.motivoConsulta) {
       return res.status(400).json({ 
-        message: 'Faltan campos requeridos',
-        recibido: req.body 
+        message: 'Faltan campos requeridos en la consulta'
       });
     }
     
@@ -132,7 +128,7 @@ exports.addConsulta = async (req, res) => {
     
     res.json(paciente);
   } catch (error) {
-
-    res.status(400).json({ message: error.message, stack: error.stack });
+    console.error('Error en addConsulta:', error);
+    return res.status(400).json({ message: 'Error al registrar la consulta' });
   }
 };

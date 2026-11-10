@@ -1,4 +1,5 @@
 const Producto = require('../models/Producto');
+const { handleServerError } = require('../middleware/errorHandler');
 
 // Evita que caracteres especiales de regex (o un objeto inyectado vía query
 // string, ej. ?search[$gt]=) rompan la búsqueda o disparen un patrón costoso.
@@ -44,7 +45,7 @@ exports.getProductos = async (req, res) => {
     
     res.json(productos);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener productos');
   }
 };
 
@@ -57,7 +58,7 @@ exports.getProductosBajoStock = async (req, res) => {
     });
     res.json(productos);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener productos con bajo stock');
   }
 };
 
@@ -70,7 +71,7 @@ exports.getProductoById = async (req, res) => {
     }
     res.json(producto);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al obtener el producto');
   }
 };
 
@@ -92,7 +93,8 @@ exports.createProducto = async (req, res) => {
     const nuevoProducto = await producto.save();
     res.status(201).json(nuevoProducto);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error('Error en createProducto:', error);
+    return res.status(400).json({ message: 'Datos de producto no válidos' });
   }
 };
 
@@ -123,7 +125,8 @@ exports.updateProducto = async (req, res) => {
 
     res.json(producto);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error('Error en updateProducto:', error);
+    return res.status(400).json({ message: 'Datos de actualización no válidos' });
   }
 };
 
@@ -143,7 +146,7 @@ exports.deleteProducto = async (req, res) => {
     
     res.json({ message: 'Producto desactivado correctamente', producto });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al desactivar el producto');
   }
 };
 
@@ -169,7 +172,7 @@ exports.updateStock = async (req, res) => {
 
     res.json(producto);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al actualizar el stock');
   }
 };
 
@@ -192,6 +195,6 @@ exports.toggleActivo = async (req, res) => {
     
     res.json(producto);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return handleServerError(res, error, 'Error al cambiar estado del producto');
   }
 };

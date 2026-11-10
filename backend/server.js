@@ -20,6 +20,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const { apiLimiter } = require('./middleware/rateLimiters');
+const { errorHandler } = require('./middleware/errorHandler');
 
 const app = express();
 
@@ -54,6 +55,14 @@ app.use('/api/reportes', require('./routes/reportes'));
 app.use('/api/pacientes', require('./routes/pacientes'));
 app.use('/api/ventas', require('./routes/ventas'));
 app.use('/api/dashboard', require('./routes/dashboard'));
+
+// Manejo de rutas inexistentes (404)
+app.use('*', (req, res) => {
+  res.status(404).json({ message: 'Ruta no encontrada' });
+});
+
+// Middleware centralizado de errores (no filtra información sensible)
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
