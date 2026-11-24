@@ -171,3 +171,4 @@ Esto impide que un atacante determine si un correo electrónico está registrado
 | **Validación de datos en el servidor** | **100% Cumplido** | Express-validator, `mongoIdParam`, `escapeRegex` contra NoSQLi, Whitelist de campos. |
 | **Permisos mínimos para recursos** | **100% Cumplido** | Solo `INTERNET` en Android, `.select('-password')`, endpoints restringidos por rol. |
 | **Manejo de errores sin exponer datos sensibles**| **100% Cumplido** | Middleware `errorHandler`, erradicación de `error.stack`, mensajes 500 genéricos y sanitizados. |
+
